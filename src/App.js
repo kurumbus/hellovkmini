@@ -6,10 +6,12 @@ class App extends Component {
 
     constructor(props) {
         super(props);
+        this.state = App.getInitState();
     }
 
     static getInitState() {
         return {
+            activePanel: 'mainPanel'
         };
     }
 
@@ -21,17 +23,13 @@ class App extends Component {
                 <View id="mainView" activePanel={this.state.activePanel}>
                     <Panel id="mainPanel">
                         <PanelHeader>
-                            Relax
+                            HELLO OCR
                         </PanelHeader>
                         <Div className="footer">
-                            <Button type="cell" align="center" onClick={this.openCredits.bind(this)}>О
-                                программе</Button>
+                            <Button type="cell" align="center" onClick={() => {}}>
+                                О программе HELLO OCR
+                            </Button>
                         </Div>
-                    </Panel>
-                    <Panel id="creditsPanel">
-                        <PanelHeader>
-                            О программе
-                        </PanelHeader>
                     </Panel>
                 </View>
             </Root>
