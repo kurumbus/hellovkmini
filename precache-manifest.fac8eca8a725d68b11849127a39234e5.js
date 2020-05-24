@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "2900896f861920835d35e0ad468a04b5",
+    "revision": "43f849fbc1525e67b0bbe6d65b05fdea",
     "url": "/hellovkmini/index.html"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/hellovkmini/static/js/2.ea6ea6bb.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "a850361ea96c6bc13186",
-    "url": "/hellovkmini/static/js/main.a8615418.chunk.js"
+    "revision": "001167ce6b791c8fccef",
+    "url": "/hellovkmini/static/js/main.cff6ad78.chunk.js"
   },
   {
     "revision": "a3617c9b76182b0d1fa6",

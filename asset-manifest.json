@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.js": "/hellovkmini/static/js/main.a8615418.chunk.js",
-    "main.js.map": "/hellovkmini/static/js/main.a8615418.chunk.js.map",
+    "main.js": "/hellovkmini/static/js/main.cff6ad78.chunk.js",
+    "main.js.map": "/hellovkmini/static/js/main.cff6ad78.chunk.js.map",
     "runtime-main.js": "/hellovkmini/static/js/runtime-main.75d19bb2.js",
     "runtime-main.js.map": "/hellovkmini/static/js/runtime-main.75d19bb2.js.map",
     "static/css/2.a28d9ceb.chunk.css": "/hellovkmini/static/css/2.a28d9ceb.chunk.css",
     "static/js/2.ea6ea6bb.chunk.js": "/hellovkmini/static/js/2.ea6ea6bb.chunk.js",
     "static/js/2.ea6ea6bb.chunk.js.map": "/hellovkmini/static/js/2.ea6ea6bb.chunk.js.map",
     "index.html": "/hellovkmini/index.html",
-    "precache-manifest.b5c15603dd008153cd08de1ee5e6f422.js": "/hellovkmini/precache-manifest.b5c15603dd008153cd08de1ee5e6f422.js",
+    "precache-manifest.fac8eca8a725d68b11849127a39234e5.js": "/hellovkmini/precache-manifest.fac8eca8a725d68b11849127a39234e5.js",
     "service-worker.js": "/hellovkmini/service-worker.js",
     "static/css/2.a28d9ceb.chunk.css.map": "/hellovkmini/static/css/2.a28d9ceb.chunk.css.map",
     "static/js/2.ea6ea6bb.chunk.js.LICENSE.txt": "/hellovkmini/static/js/2.ea6ea6bb.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.75d19bb2.js",
     "static/css/2.a28d9ceb.chunk.css",
     "static/js/2.ea6ea6bb.chunk.js",
-    "static/js/main.a8615418.chunk.js"
+    "static/js/main.cff6ad78.chunk.js"
   ]
 }
