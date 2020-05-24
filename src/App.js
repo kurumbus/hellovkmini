@@ -156,7 +156,7 @@ class App extends Component {
                                 <Gallery
                                     slideWidth="90%"
                                     align="center"
-                                    style={{ height: 150 }}
+                                    style={{ height: 300 }}
                                     slideIndex={this.state.slideIndex}
                                     onChange={slideIndex => this.setState({slideIndex})}
                                 >
