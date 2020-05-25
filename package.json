@@ -20,6 +20,7 @@
     "@vkontakte/vkui": "^3.9.5",
     "@vkontakte/vkui-connect": "^1.5.4",
     "axios": "^0.19.2",
+    "jss": "^10.1.1",
     "leaflet": "^1.6.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",

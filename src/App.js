@@ -21,8 +21,9 @@ import {
 import '@vkontakte/vkui/dist/vkui.css';
 import Dropzone from "react-dropzone";
 import request from "superagent";
-import L from "leaflet"
-require('./vendor/leaflet-openweathermap.js');
+import SimpleExample from "./components/SimpleExample";
+import './css/style.css'
+import WikiExtract from "./components/WikiExtract";
 
 class App extends Component {
 
@@ -77,7 +78,7 @@ class App extends Component {
                         <PanelHeader>
                             Лапа - котина любимица
                         </PanelHeader>
-                        <Group title="Звуки">
+                        <Group>
                             <List>
                                 <Div>
                                     <Dropzone onDrop={this.onDropFiles()}>
@@ -133,24 +134,37 @@ class App extends Component {
                             <Group header={<Header mode="secondary">Места на фотографии:</Header>}>
                                 {
                                     this.state.landmarks.map((landmark, i) => {
-                                       // let zoom = this.zoom ? this.zoom : 10;
-                                      //  let myMap = L.map("map").setView([landmark.locations[0].latitude, landmark.locations[0].longitude], zoom);
-                                        /*L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-                                            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-                                            maxZoom: 18,
-                                            id: 'mapbox/streets-v11',
-                                            tileSize: 512,
-                                            zoomOffset: -1,
-                                            accessToken: "pk.eyJ1Ijoia3VydW1idXMiLCJhIjoiY2s4NWplbWgyMDdpdTNldnBrcTF3a2Q0aCJ9.l0FPgUKy2gpn9MAEvk5eiA"
-                                        }).addTo(myMap);*/
-
+                                        console.log(landmark.wiki);
                                         return (
-                                            <Div style={{marginVertical: 20}}>
+                                            <Div style={{marginVertical: 20}} key={JSON.stringify(landmark)}>
                                                 <Card>
                                                     <Div>{landmark.title}</Div>
                                                     { landmark.locations.length > 0 &&
-                                                    <Div id={'map'+i}>
+                                                        <SimpleExample lat={landmark.locations[0].latitude}
+                                                                       lng={landmark.locations[0].longitude}
+                                                        />
+                                                    }
+                                                    { landmark.wiki &&
+                                                    <Div>
+                                                        {
+                                                            landmark.wiki.map(article => {
+                                                                return (
+                                                                    <Div key={JSON.stringify(article)}>
+                                                                        <Div>
+                                                                            {article.title}
+                                                                        </Div>
+                                                                        <Div>
+                                                                            {   article.thumbnail && article.thumbnail.source &&
+                                                                                <Avatar size={72} mode="image"
+                                                                                        src={article.thumbnail.source}
+                                                                                />
+                                                                            }
 
+                                                                        </Div>
+                                                                    </Div>
+                                                                )
+                                                            })
+                                                        }
                                                     </Div>
                                                     }
                                                 </Card>
@@ -166,6 +180,7 @@ class App extends Component {
                                 {
                                     this.state.pagesWithMatchingImages.map(page =>
                                         <RichCell
+                                            key={JSON.stringify(page)}
                                             disabled
                                             multiline
                                             before={<Avatar size={72} mode="image" src={this.getPageImage(page)}/>}
@@ -200,12 +215,11 @@ class App extends Component {
                                     {
                                         this.state.visuallySimilarImages.map(image =>
                                             <div style={{
-                                                backgroundColor: '#5b9be6',
                                                 backgroundImage: 'url('+image+')',
                                                 backgroundPosition: 'right bottom',
-                                                backgroundSize: '102%',
+                                                backgroundSize: '100%',
                                                 backgroundRepeat: 'no-repeat',
-                                            }} />
+                                            }} key={image}/>
                                         )
                                     }
                                 </Gallery>
