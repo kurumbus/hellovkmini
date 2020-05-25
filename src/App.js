@@ -41,15 +41,19 @@ class App extends Component {
             visuallySimilarImages: [],
             landmarks: [],
             slideIndex: 0,
+            displayResultsMode: false,
+            preview: null,
         };
     }
 
     onDropFiles() {
         let _this = this;
         return function (files) {
+            console.log(files);
+
             _this.setState({
                 showSpinner: true, pagesWithMatchingImages: [], webEntities: [],
-                visuallySimilarImages: [], slideIndex: 0, landmarks: [],
+                visuallySimilarImages: [], slideIndex: 0, landmarks: [], displayResultsMode: false, preview: null,
             });
             const req = request.post('https://ocr.kurumbus.com/api/web');
             files.forEach(file => {
@@ -63,7 +67,7 @@ class App extends Component {
                     webEntities: res.body.web_entities ?? [],
                     landmarks: res.body.landmarks ?? [],
                     visuallySimilarImages: res.body.visually_similar_images ?? [],
-                    showSpinner: false,
+                    showSpinner: false, displayResultsMode: true, preview: res.body.file_url
                 });
             });
         };
@@ -79,16 +83,17 @@ class App extends Component {
                             Лапа - котина любимица
                         </PanelHeader>
                         <Group>
-                            <List>
+                            {
+                                ! this.state.displayResultsMode &&
                                 <Div>
-                                    <Dropzone onDrop={this.onDropFiles()}>
+                                    <Dropzone onDrop={this.onDropFiles()} accept="image/jpeg,image/jpg,image/png">
                                         {({getRootProps, getInputProps}) => (
                                             <section>
                                                 <Banner {...getRootProps()}
                                                         mode="image"
                                                         size="m"
                                                         header="Выберите файл"
-                                                        subheader={<span>Выберите файл для распознавания</span>}
+                                                        subheader={<span>для распознавания</span>}
                                                         background={
                                                             <div
                                                                 style={{
@@ -102,14 +107,36 @@ class App extends Component {
                                                                 <input {...getInputProps()} />
                                                             </div>
                                                         }
-                                                        asideMode="dismiss"
-                                                        actions={<Button mode="overlay" size="l">Подробнее</Button>}
+                                                        actions={<Button mode="overlay" size="l">Выбрать</Button>}
                                                 />
                                             </section>
                                         )}
                                     </Dropzone>
                                 </Div>
-                            </List>
+                            }
+                            {
+                                this.state.displayResultsMode &&
+                                <Div>
+                                    <Banner mode="image"
+                                            size="m"
+                                            style={{ height: 128 }}
+                                            className="result-banner"
+                                            background={
+                                                <div
+                                                    style={{
+                                                        backgroundColor: '#5b9be6',
+                                                        backgroundImage: 'url('+this.state.preview+')',
+                                                        backgroundPosition: 'center center',
+                                                        backgroundSize: '100%',
+                                                        backgroundRepeat: 'no-repeat',
+                                                    }}
+                                                />
+                                            }
+                                            actions={<Button mode="overlay" size="l" onClick={() => this._refresh()}>Сбросить</Button>}
+                                    />
+                                </Div>
+                            }
+
                         </Group>
                         {
                             this.state.showSpinner && (
@@ -160,7 +187,7 @@ class App extends Component {
                                                                             before={<Avatar size={72} mode="image" src={this.getWikiImage(article)} />}
                                                                             caption={article.extract}
                                                                             actions={
-                                                                                <React.Fragment style={{textAlign: 'right'}}>
+                                                                                <React.Fragment>
                                                                                     <Link href={"https://en.wikipedia.org/wiki/"+article.title} target="_blank">
                                                                                         <Button mode="secondary">Открыть</Button>
                                                                                     </Link>
@@ -258,6 +285,26 @@ class App extends Component {
         return require('./images/wiki.svg')
     }
 
+    getPreview() {
+        if (! this.state.preview) {
+            return require('./images/wiki.svg')
+        }
+        const reader = new FileReader()
+
+        reader.onabort = () => console.log('file reading was aborted');
+        reader.onerror = () => console.log('file reading has failed');
+        reader.onload = () => {
+            // Do whatever you want with the file contents
+            const binaryStr = reader.result;
+            console.log(binaryStr);
+            return reader.result;
+        };
+        reader.readAsArrayBuffer(this.state.preview)
+    }
+
+    _refresh() {
+        this.setState(App.getInitState());
+    }
 }
 
 export default App;
