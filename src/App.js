@@ -50,7 +50,6 @@ class App extends Component {
     onDropFiles() {
         let _this = this;
         return function (files) {
-            console.log(files);
 
             _this.setState({
                 showSpinner: true, pagesWithMatchingImages: [], webEntities: [],
@@ -61,7 +60,6 @@ class App extends Component {
                 req.attach('file', file);
             });
             req.then(res => {
-                console.log(res);
 
                 _this.setState({
                     pagesWithMatchingImages: res.body.pages_with_matching_images ?? [],
@@ -288,23 +286,6 @@ class App extends Component {
             return  article.thumbnail.source;
         }
         return require('./images/wiki.svg')
-    }
-
-    getPreview() {
-        if (! this.state.preview) {
-            return require('./images/wiki.svg')
-        }
-        const reader = new FileReader()
-
-        reader.onabort = () => console.log('file reading was aborted');
-        reader.onerror = () => console.log('file reading has failed');
-        reader.onload = () => {
-            // Do whatever you want with the file contents
-            const binaryStr = reader.result;
-            console.log(binaryStr);
-            return reader.result;
-        };
-        reader.readAsArrayBuffer(this.state.preview)
     }
 
     _refresh() {
