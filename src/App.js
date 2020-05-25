@@ -14,7 +14,7 @@ import {
     PanelHeader,
     platform,
     RichCell,
-    Root,
+    Root, SimpleCell,
     Spinner,
     View
 } from '@vkontakte/vkui';
@@ -134,38 +134,46 @@ class App extends Component {
                             <Group header={<Header mode="secondary">Места на фотографии:</Header>}>
                                 {
                                     this.state.landmarks.map((landmark, i) => {
-                                        console.log(landmark.wiki);
                                         return (
                                             <Div style={{marginVertical: 20}} key={JSON.stringify(landmark)}>
-                                                <Card>
+                                                <Card mode="shadow">
                                                     <Div>{landmark.title}</Div>
                                                     { landmark.locations.length > 0 &&
-                                                        <SimpleExample lat={landmark.locations[0].latitude}
-                                                                       lng={landmark.locations[0].longitude}
-                                                        />
+                                                    <SimpleExample lat={landmark.locations[0].latitude}
+                                                                   lng={landmark.locations[0].longitude}
+                                                    />
                                                     }
                                                     { landmark.wiki &&
-                                                    <Div>
+                                                    <Group header={/*<Header mode="secondary"><Avatar size={16} /></Header>*/
+                                                        <SimpleCell
+                                                            before={<Avatar size={28} src={require('./images/wiki.svg')} />}
+                                                        >
+                                                            Результаты из Википедии
+                                                        </SimpleCell>}>
                                                         {
                                                             landmark.wiki.map(article => {
                                                                 return (
-                                                                    <Div key={JSON.stringify(article)}>
-                                                                        <Div>
-                                                                            {article.title}
-                                                                        </Div>
-                                                                        <Div>
-                                                                            {   article.thumbnail && article.thumbnail.source &&
-                                                                                <Avatar size={72} mode="image"
-                                                                                        src={article.thumbnail.source}
-                                                                                />
+                                                                    <Card mode="outline" key={JSON.stringify(article)}>
+                                                                        <RichCell
+                                                                            disabled
+                                                                            multiline
+                                                                            before={<Avatar size={72} mode="image" src={this.getWikiImage(article)} />}
+                                                                            caption={article.extract}
+                                                                            actions={
+                                                                                <React.Fragment style={{textAlign: 'right'}}>
+                                                                                    <Link href={"https://en.wikipedia.org/wiki/"+article.title} target="_blank">
+                                                                                        <Button mode="secondary">Открыть</Button>
+                                                                                    </Link>
+                                                                                </React.Fragment>
                                                                             }
-
-                                                                        </Div>
-                                                                    </Div>
+                                                                        >
+                                                                            {article.title}
+                                                                        </RichCell>
+                                                                    </Card>
                                                                 )
                                                             })
                                                         }
-                                                    </Div>
+                                                    </Group>
                                                     }
                                                 </Card>
                                             </Div>
@@ -187,7 +195,7 @@ class App extends Component {
                                             actions={
                                                 <React.Fragment>
                                                     <Link href={page.url} target="_blank">
-                                                        <Button>
+                                                        <Button mode="secondary">
                                                             Открыть
                                                         </Button>
                                                     </Link>
@@ -240,7 +248,14 @@ class App extends Component {
         if (page.full_matching_images && page.full_matching_images.length > 0) {
             return  page.full_matching_images[0].url;
         }
-        return 'https://sun6-16.userapi.com/TsyTWRNoAgLrdrGDa8Y-ixTzN2z7_4r5tuSO6Q/nC9XgsF2loA.jpg'
+        return require('./images/wiki.svg')
+    }
+
+    getWikiImage(article) {
+        if (article && article.thumbnail) {
+            return  article.thumbnail.source;
+        }
+        return require('./images/wiki.svg')
     }
 
 }
