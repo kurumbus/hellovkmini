@@ -12,6 +12,7 @@ import {
     List,
     Panel,
     PanelHeader,
+    PanelHeaderContent,
     platform,
     RichCell,
     Root, SimpleCell,
@@ -80,7 +81,11 @@ class App extends Component {
                 <View id="mainView" activePanel={this.state.activePanel}>
                     <Panel id="mainPanel">
                         <PanelHeader>
-                            Лапа - котина любимица
+                            <PanelHeaderContent
+                                status="достопримечательностей и предметов по фото"
+                            >
+                                Распознавание
+                            </PanelHeaderContent>
                         </PanelHeader>
                         <Group>
                             {
