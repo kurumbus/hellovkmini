@@ -1,27 +1,27 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "4f40e1a793e18061bddf405f0ebfa6dd",
+    "revision": "c3ddf47ded9732b2061c2974538d7123",
     "url": "/hellovkmini/index.html"
   },
   {
-    "revision": "facf2f8e36ed8c74347e",
+    "revision": "e1e95835d6fe7f31934f",
     "url": "/hellovkmini/static/css/2.bc88d66f.chunk.css"
   },
   {
-    "revision": "20929f7ba2015a601066",
-    "url": "/hellovkmini/static/css/main.b8b5abef.chunk.css"
+    "revision": "92ce5a1db25f532d27d3",
+    "url": "/hellovkmini/static/css/main.9e87ad29.chunk.css"
   },
   {
-    "revision": "facf2f8e36ed8c74347e",
-    "url": "/hellovkmini/static/js/2.35b6d36c.chunk.js"
+    "revision": "e1e95835d6fe7f31934f",
+    "url": "/hellovkmini/static/js/2.2d5981f5.chunk.js"
   },
   {
     "revision": "da75538c52411804769b514107a743de",
-    "url": "/hellovkmini/static/js/2.35b6d36c.chunk.js.LICENSE.txt"
+    "url": "/hellovkmini/static/js/2.2d5981f5.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "20929f7ba2015a601066",
-    "url": "/hellovkmini/static/js/main.a5076716.chunk.js"
+    "revision": "92ce5a1db25f532d27d3",
+    "url": "/hellovkmini/static/js/main.7e7a29f7.chunk.js"
   },
   {
     "revision": "a3617c9b76182b0d1fa6",
