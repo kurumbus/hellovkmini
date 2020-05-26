@@ -12,7 +12,7 @@ import {
     List,
     Panel,
     PanelHeader,
-    PanelHeaderContent,
+    PanelHeaderContent, Placeholder,
     platform,
     RichCell,
     Root, SimpleCell,
@@ -24,7 +24,7 @@ import Dropzone from "react-dropzone";
 import request from "superagent";
 import SimpleExample from "./components/SimpleExample";
 import './css/style.css'
-import WikiExtract from "./components/WikiExtract";
+import Icon28HelpOutline from '@vkontakte/icons/dist/28/help_outline';
 
 class App extends Component {
 
@@ -114,6 +114,13 @@ class App extends Component {
                                         </section>
                                     )}
                                 </Dropzone>
+                                <Placeholder
+                                    icon={<Icon28HelpOutline />}
+                                >
+                                    Приложение распознаёт места и предметы с помощью искусственного интеллекта.<br/>
+                                    Находит местоположение, ключевые слова, полезную информацию и ссылки.
+
+                                </Placeholder>
                             </Group>
                         }
                         {
@@ -121,6 +128,8 @@ class App extends Component {
                             <Group>
                                 <Banner mode="image"
                                         size="m"
+                                        header={<Div></Div>}
+                                        subheader=""
                                         background={
                                             <div
                                                 style={{
