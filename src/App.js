@@ -5,11 +5,9 @@ import {
     Button,
     Card,
     Div,
-    Gallery,
     Group,
     Header,
     Link,
-    List,
     Panel,
     PanelHeader,
     PanelHeaderContent, Placeholder,
@@ -73,7 +71,7 @@ class App extends Component {
     }
 
     render() {
-        const osname = platform();
+        // const osname = platform();
         return (
             <Root activeView="mainView">
                 <View id="mainView" activePanel={this.state.activePanel}>
@@ -249,25 +247,13 @@ class App extends Component {
                         {
                             this.state.visuallySimilarImages.length > 0 &&
                             <Group header={<Header mode="secondary">Похожие картинки:</Header>}>
-
-                                <Gallery
-                                    slideWidth="90%"
-                                    align="center"
-                                    style={{ height: 300 }}
-                                    slideIndex={this.state.slideIndex}
-                                    onChange={slideIndex => this.setState({slideIndex})}
-                                >
+                                <Div>
                                     {
                                         this.state.visuallySimilarImages.map(image =>
-                                            <div style={{
-                                                backgroundImage: 'url('+image+')',
-                                                backgroundPosition: 'right bottom',
-                                                backgroundSize: '100%',
-                                                backgroundRepeat: 'no-repeat',
-                                            }} key={image}/>
+                                            <img alt="" src={image} key={image} style={{width: '100%'}} />
                                         )
                                     }
-                                </Gallery>
+                                </Div>
                             </Group>
                         }
 

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
-import { Div } from '@vkontakte/vkui';
 import "leaflet/dist/leaflet.css"
 
 
