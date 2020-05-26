@@ -80,67 +80,62 @@ class App extends Component {
                     <Panel id="mainPanel">
                         <PanelHeader>
                             <PanelHeaderContent
-                                status="достопримечательностей и предметов по фото"
+                                status="места и приедметы"
                             >
                                 Распознавание
                             </PanelHeaderContent>
                         </PanelHeader>
-                        <Group>
-                            {
-                                ! this.state.displayResultsMode &&
-                                <Div>
-                                    <Dropzone onDrop={this.onDropFiles()} accept="image/jpeg,image/jpg,image/png">
-                                        {({getRootProps, getInputProps}) => (
-                                            <section>
-                                                <Banner {...getRootProps()}
-                                                        mode="image"
-                                                        size="m"
-                                                        header="Выберите файл"
-                                                        subheader={<span>для распознавания</span>}
-                                                        background={
-                                                            <div
-                                                                style={{
-                                                                    backgroundColor: '#5b9be6',
-                                                                    backgroundImage: 'url(https://sun9-31.userapi.com/PQ4UCzqE_jue9hAINefBMorYCdfGXvcuV5nSjA/eYugcFYzdW8.jpg)',
-                                                                    backgroundPosition: 'right bottom',
-                                                                    backgroundSize: '102%',
-                                                                    backgroundRepeat: 'no-repeat',
-                                                                }}
-                                                            >
-                                                                <input {...getInputProps()} />
-                                                            </div>
-                                                        }
-                                                        actions={<Button mode="overlay" size="l">Выбрать</Button>}
-                                                />
-                                            </section>
-                                        )}
-                                    </Dropzone>
-                                </Div>
-                            }
-                            {
-                                this.state.displayResultsMode &&
-                                <Div>
-                                    <Banner mode="image"
-                                            size="m"
-                                            style={{ height: 128 }}
-                                            className="result-banner"
-                                            background={
-                                                <div
-                                                    style={{
-                                                        backgroundColor: '#5b9be6',
-                                                        backgroundImage: 'url('+this.state.preview+')',
-                                                        backgroundPosition: 'center center',
-                                                        backgroundSize: '100%',
-                                                        backgroundRepeat: 'no-repeat',
-                                                    }}
-                                                />
-                                            }
-                                            actions={<Button mode="overlay" size="l" onClick={() => this._refresh()}>Сбросить</Button>}
-                                    />
-                                </Div>
-                            }
-
-                        </Group>
+                        {
+                            ! this.state.displayResultsMode &&
+                            <Group>
+                                <Dropzone onDrop={this.onDropFiles()} accept="image/jpeg,image/jpg,image/png">
+                                    {({getRootProps, getInputProps}) => (
+                                        <section>
+                                            <Banner {...getRootProps()}
+                                                    mode="image"
+                                                    size="m"
+                                                    header="Выберите файл"
+                                                    subheader={<span>для распознавания</span>}
+                                                    background={
+                                                        <div
+                                                            style={{
+                                                                backgroundColor: '#5b9be6',
+                                                                backgroundImage: 'url(https://sun9-31.userapi.com/PQ4UCzqE_jue9hAINefBMorYCdfGXvcuV5nSjA/eYugcFYzdW8.jpg)',
+                                                                backgroundPosition: 'right bottom',
+                                                                backgroundSize: '102%',
+                                                                backgroundRepeat: 'no-repeat',
+                                                            }}
+                                                        >
+                                                            <input {...getInputProps()} />
+                                                        </div>
+                                                    }
+                                                    actions={<Button mode="overlay" size="l">Выбрать</Button>}
+                                            />
+                                        </section>
+                                    )}
+                                </Dropzone>
+                            </Group>
+                        }
+                        {
+                            this.state.displayResultsMode &&
+                            <Group>
+                                <Banner mode="image"
+                                        size="m"
+                                        background={
+                                            <div
+                                                style={{
+                                                    backgroundColor: '#5b9be6',
+                                                    backgroundImage: 'url('+this.state.preview+')',
+                                                    backgroundPosition: 'center center',
+                                                    backgroundSize: 'cover',
+                                                    backgroundRepeat: 'no-repeat',
+                                                }}
+                                            />
+                                        }
+                                        actions={<Button mode="overlay" size="l" onClick={() => this._refresh()}>Сбросить</Button>}
+                                />
+                            </Group>
+                        }
                         {
                             this.state.showSpinner && (
                                 <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
@@ -149,19 +144,8 @@ class App extends Component {
                             )
                         }
                         {
-                            this.state.webEntities.length > 0 &&
-                            <Group  header={<Header mode="secondary">Результат распознавания:</Header>}>
-
-                                <Div>
-                                    {
-                                        this.state.webEntities.join(', ')
-                                    }
-                                </Div>
-                            </Group>
-                        }
-                        {
                             this.state.landmarks.length > 0 &&
-                            <Group header={<Header mode="secondary">Места на фотографии:</Header>}>
+                            <Group header={<Header mode="secondary">Места на фотографии:</Header>} style={{marginTop: 20}}>
                                 {
                                     this.state.landmarks.map((landmark, i) => {
                                         return (
@@ -210,6 +194,20 @@ class App extends Component {
                                         )
                                     })
                                 }
+                            </Group>
+                        }
+                        {
+                            this.state.webEntities.length > 0 &&
+                            <Group  header={<Header mode="secondary">Ключевые слова:</Header>}>
+                                <Div style={{marginVertical: 20}}>
+                                    <Card mode="shadow">
+                                        <Div>
+                                            {
+                                                this.state.webEntities.join(', ')
+                                            }
+                                        </Div>
+                                    </Card>
+                                </Div>
                             </Group>
                         }
                         {
