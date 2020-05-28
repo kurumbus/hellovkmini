@@ -17,6 +17,7 @@ import {
     Spinner,
     View
 } from '@vkontakte/vkui';
+import bridge from '@vkontakte/vk-bridge';
 import '@vkontakte/vkui/dist/vkui.css';
 import Dropzone from "react-dropzone";
 import request from "superagent";
@@ -42,6 +43,9 @@ class App extends Component {
             slideIndex: 0,
             displayResultsMode: false,
             preview: null,
+            photos: {},
+            profilePhotos: [],
+            token: null,
         };
     }
 
@@ -107,11 +111,35 @@ class App extends Component {
                                                             <input {...getInputProps()} />
                                                         </div>
                                                     }
-                                                    actions={<Button mode="overlay" size="l">Выбрать</Button>}
+                                                    actions={<Button mode="secondary" size="l">Выбрать</Button>}
                                             />
                                         </section>
                                     )}
                                 </Dropzone>
+                                <Div>
+                                    <Button onClick={() => this.initializeBridge()}>
+                                        Выбрать Фото Профиля
+                                    </Button>
+                                </Div>
+                                {
+                                    this.state.profilePhotos.length >0 &&
+                                        <Div>
+                                            {
+                                                this.state.profilePhotos.map(img =>
+                                                    <img alt=""
+                                                         src={img.sizes[2].url}
+                                                         key={img.sizes[2].url}
+                                                         style={{width: '100%'}}
+                                                         onerror="this.style.display='none'"
+                                                    />
+                                                )
+                                            }
+                                        </Div>
+                                }
+                                <Div>
+                                    {JSON.stringify(this.state.token)}
+                                    {JSON.stringify(this.state.photos)}
+                                </Div>
                                 <Placeholder
                                     icon={<Icon28HelpOutline />}
                                 >
@@ -139,7 +167,7 @@ class App extends Component {
                                                 }}
                                             />
                                         }
-                                        actions={<Button mode="overlay" size="l" onClick={() => this._refresh()}>Сбросить</Button>}
+                                        actions={<Button mode="secondary" size="l" onClick={() => this._refresh()}>Сбросить</Button>}
                                 />
                             </Group>
                         }
@@ -250,7 +278,12 @@ class App extends Component {
                                 <Div>
                                     {
                                         this.state.visuallySimilarImages.map(image =>
-                                            <img alt="" src={image} key={image} style={{width: '100%'}} />
+                                            <img alt=""
+                                                 src={image}
+                                                 key={image}
+                                                 style={{width: '100%'}}
+                                                 onerror="this.style.display='none'"
+                                            />
                                         )
                                     }
                                 </Div>
@@ -283,6 +316,25 @@ class App extends Component {
 
     _refresh() {
         this.setState(App.getInitState());
+    }
+
+    initializeBridge() {
+        // Подписывается на события, отправленные нативным клиентом
+        bridge.subscribe((e) => console.log(e));
+
+        // Отправляет событие нативному клиенту
+        bridge.send("VKWebAppInit", {});
+
+        bridge.send("VKWebAppGetAuthToken", {"app_id": 7481050, "scope": "photos"}).then(data => {
+            this.setState({token: data});
+
+            const access_token =  data.access_token;
+            bridge.send("VKWebAppCallAPIMethod",
+                {"method": "photos.get", "request_id": "32test", "params": {"v":"5.107", "album_id":"profile", "access_token": access_token}}
+                ).then(res => {
+                    this.setState({profilePhotos: res.response.items, photos: res});
+                });
+        });
     }
 }
 
