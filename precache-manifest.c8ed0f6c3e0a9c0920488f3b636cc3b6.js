@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "bc0067030bbebbe24db853439bce091e",
+    "revision": "7329949ec9309018f5d0c9c324efc6e5",
     "url": "/hellovkmini/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/hellovkmini/static/css/2.bc88d66f.chunk.css"
   },
   {
-    "revision": "9e30e5bd43aace62da20",
+    "revision": "d047790c16aef4ea8ce8",
     "url": "/hellovkmini/static/css/main.9e87ad29.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/hellovkmini/static/js/2.31f4ab6f.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "9e30e5bd43aace62da20",
-    "url": "/hellovkmini/static/js/main.543dfea5.chunk.js"
+    "revision": "d047790c16aef4ea8ce8",
+    "url": "/hellovkmini/static/js/main.5aab7f4c.chunk.js"
   },
   {
     "revision": "a3617c9b76182b0d1fa6",
