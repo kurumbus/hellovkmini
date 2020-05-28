@@ -95,12 +95,12 @@ class App extends Component {
                     onClose={() => this.setState({activeModal: null})}
                     header={
                         <ModalPageHeader>
-                            Выберите фото профиля
+                            Выберите фото
                         </ModalPageHeader>
                     }
                 >
 
-                   <Div  style={{minHeight:400}}>
+                   <Div  style={{minHeight:1200}}>
                        {
                            this.state.profilePhotos.length  == 0 &&
                                <Div>
@@ -176,11 +176,13 @@ class App extends Component {
                                         Выбрать Фото Профиля
                                     </Button>
                                 </Div>
+                                <Div>
+                                    <Button onClick={() => this.selectWallPhoto()} mode={"secondary"} size="xl">
+                                        Выбрать Фото Со Стены
+                                    </Button>
+                                </Div>
                                 {/*<Div>
-                                   {JSON.stringify(this.state.activeModal)}
-                                   {JSON.stringify(this.state.modalHistory)}
-                                    {JSON.stringify(this.state.token)}
-                                    {JSON.stringify(this.state.photos)}
+                                   {JSON.stringify(this.state.status)}
                                 </Div>*/}
                                 <Placeholder
                                     icon={<Icon28HelpOutline />}
@@ -394,18 +396,38 @@ class App extends Component {
 
 
     selectProfilePhoto() {
+        this.setState({showSpinner: true});
         bridge.subscribe((e) => console.log(e));
         bridge.send("VKWebAppInit", {});
         bridge.send("VKWebAppGetAuthToken", {"app_id": 7481050, "scope": "photos"}).then(data => {
             this.setState({token: data});
             const access_token =  data.access_token;
             bridge.send("VKWebAppCallAPIMethod",
-                {"method": "photos.get", "request_id": "32test", "params": {"v":"5.107", "album_id":"profile", "access_token": access_token}}
+                {"method": "photos.get", "request_id": "32test", "params": {"rev": 1, "v":"5.107", "album_id":"profile", "access_token": access_token}}
                 ).then(res => {
-                    this.setState({profilePhotos: res.response.items}, () => {
+                    this.setState({profilePhotos: res.response.items, showSpinner: false}, () => {
                         this.setActiveModal(MODAL_PROFILE_PHOTOS);
                     });
                 });
+        });
+    }
+
+    selectWallPhoto() {
+        this.setState({showSpinner: true});
+        bridge.subscribe((e) => console.log(e));
+        bridge.send("VKWebAppInit", {});
+        bridge.send("VKWebAppGetAuthToken", {"app_id": 7481050, "scope": "photos"}).then(data => {
+            this.setState({token: data, status: "request"});
+            const access_token =  data.access_token;
+            bridge.send("VKWebAppCallAPIMethod",
+                {"method": "photos.get", "request_id": "32test", "params": {"rev": 1, "v":"5.107", "album_id":"wall", "access_token": access_token}}
+            ).then(res => {
+                this.setState({status: res, profilePhotos: res.response.items, showSpinner: false}, () => {
+                    this.setActiveModal(MODAL_PROFILE_PHOTOS);
+                });
+            }).catch(error => {
+                this.setState({status: error})
+            });
         });
     }
 
