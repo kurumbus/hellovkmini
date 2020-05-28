@@ -8,6 +8,9 @@ import {
     Group,
     Header,
     Link,
+    ModalPage,
+    ModalPageHeader,
+    ModalRoot,
     Panel,
     PanelHeader,
     PanelHeaderContent, Placeholder,
@@ -24,6 +27,8 @@ import request from "superagent";
 import SimpleExample from "./components/SimpleExample";
 import './css/style.css'
 import Icon28HelpOutline from '@vkontakte/icons/dist/28/help_outline';
+
+const MODAL_PROFILE_PHOTOS = 'modal_profile_photos';
 
 class App extends Component {
 
@@ -45,7 +50,10 @@ class App extends Component {
             preview: null,
             photos: {},
             profilePhotos: [],
+            activeModal: null,
+            modalHistory: [],
             token: null,
+            status: null,
         };
     }
 
@@ -76,8 +84,55 @@ class App extends Component {
 
     render() {
         // const osname = platform();
+        const modal = (
+            <ModalRoot
+                activeModal={this.state.activeModal}
+            >
+                <ModalPage
+                    dynamicContentHeight
+                    settlingHeight={80}
+                    id={MODAL_PROFILE_PHOTOS}
+                    onClose={() => this.setState({activeModal: null})}
+                    header={
+                        <ModalPageHeader>
+                            Выберите фото профиля
+                        </ModalPageHeader>
+                    }
+                >
+
+                   <Div  style={{minHeight:400}}>
+                       {
+                           this.state.profilePhotos.length  == 0 &&
+                               <Div>
+                                   <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+                                       <Spinner size="large" style={{ marginTop: 200 }} />
+                                   </div>
+                               </Div>
+                       }
+                       {
+                           this.state.profilePhotos.length >0 &&
+                           <Div>
+                               {
+                                   this.state.profilePhotos.map(img =>
+                                       <img alt=""
+                                            onClick={() => {this.selectPhoto(img.sizes[2].url)}}
+                                            src={img.sizes[2].url}
+                                            key={img.sizes[2].url}
+                                            style={{width: '100%'}}
+                                            onerror="this.style.display='none'"
+                                       />
+                                   )
+                               }
+                           </Div>
+                       }
+                   </Div>
+                </ModalPage>
+            </ModalRoot>
+        );
+
+
         return (
-            <Root activeView="mainView">
+            <Root activeView="mainView" modal={modal}>
                 <View id="mainView" activePanel={this.state.activePanel}>
                     <Panel id="mainPanel">
                         <PanelHeader>
@@ -111,35 +166,22 @@ class App extends Component {
                                                             <input {...getInputProps()} />
                                                         </div>
                                                     }
-                                                    actions={<Button mode="secondary" size="l">Выбрать</Button>}
+                                                    actions={<Button mode="secondary_overlay" size="l">Выбрать</Button>}
                                             />
                                         </section>
                                     )}
                                 </Dropzone>
                                 <Div>
-                                    <Button onClick={() => this.initializeBridge()}>
+                                    <Button onClick={() => this.selectProfilePhoto()} mode={"secondary"} size="xl">
                                         Выбрать Фото Профиля
                                     </Button>
                                 </Div>
-                                {
-                                    this.state.profilePhotos.length >0 &&
-                                        <Div>
-                                            {
-                                                this.state.profilePhotos.map(img =>
-                                                    <img alt=""
-                                                         src={img.sizes[2].url}
-                                                         key={img.sizes[2].url}
-                                                         style={{width: '100%'}}
-                                                         onerror="this.style.display='none'"
-                                                    />
-                                                )
-                                            }
-                                        </Div>
-                                }
-                                <Div>
+                                {/*<Div>
+                                   {JSON.stringify(this.state.activeModal)}
+                                   {JSON.stringify(this.state.modalHistory)}
                                     {JSON.stringify(this.state.token)}
                                     {JSON.stringify(this.state.photos)}
-                                </Div>
+                                </Div>*/}
                                 <Placeholder
                                     icon={<Icon28HelpOutline />}
                                 >
@@ -167,7 +209,7 @@ class App extends Component {
                                                 }}
                                             />
                                         }
-                                        actions={<Button mode="secondary" size="l" onClick={() => this._refresh()}>Сбросить</Button>}
+                                        actions={<Button mode="secondary_overlay" size="l" onClick={() => this._refresh()}>Сбросить</Button>}
                                 />
                             </Group>
                         }
@@ -241,6 +283,9 @@ class App extends Component {
                                                 this.state.webEntities.join(', ')
                                             }
                                         </Div>
+                                        <Div>
+                                            <Button mode="secondary" onClick={() => {this.translateWebEntities()}}>Перевести</Button>
+                                        </Div>
                                     </Card>
                                 </Div>
                             </Group>
@@ -296,6 +341,17 @@ class App extends Component {
         );
     }
 
+    translateWebEntities() {
+        const _this = this;
+        let req = request.post('https://ocr.kurumbus.com/api/translate')
+            .send({ "text":  this.state.webEntities.join(', ')});
+        req.then(res => {
+            _this.setState({
+                webEntities: res.body.text.split(',') ?? [],
+            });
+        });
+    }
+
     getPageImage(page) {
         if (page.partial_matching_images && page.partial_matching_images.length > 0) {
             return  page.partial_matching_images[0].url;
@@ -318,22 +374,59 @@ class App extends Component {
         this.setState(App.getInitState());
     }
 
-    initializeBridge() {
-        // Подписывается на события, отправленные нативным клиентом
+    setActiveModal(activeModal) {
+        activeModal = activeModal || null;
+        let modalHistory = this.state.modalHistory ? [...this.state.modalHistory] : [];
+
+        if (activeModal === null) {
+            modalHistory = [];
+        } else if (modalHistory.indexOf(activeModal) !== -1) {
+            modalHistory = modalHistory.splice(0, modalHistory.indexOf(activeModal) + 1);
+        } else {
+            modalHistory.push(activeModal);
+        }
+
+        this.setState({
+            activeModal,
+            modalHistory
+        });
+    }
+
+
+    selectProfilePhoto() {
         bridge.subscribe((e) => console.log(e));
-
-        // Отправляет событие нативному клиенту
         bridge.send("VKWebAppInit", {});
-
         bridge.send("VKWebAppGetAuthToken", {"app_id": 7481050, "scope": "photos"}).then(data => {
             this.setState({token: data});
-
             const access_token =  data.access_token;
             bridge.send("VKWebAppCallAPIMethod",
                 {"method": "photos.get", "request_id": "32test", "params": {"v":"5.107", "album_id":"profile", "access_token": access_token}}
                 ).then(res => {
-                    this.setState({profilePhotos: res.response.items, photos: res});
+                    this.setState({profilePhotos: res.response.items}, () => {
+                        this.setActiveModal(MODAL_PROFILE_PHOTOS);
+                    });
                 });
+        });
+    }
+
+    selectPhoto(url) {
+        this.setState({status: url});
+        this.setActiveModal(null);
+        this.setState({
+            showSpinner: true, pagesWithMatchingImages: [], webEntities: [],
+            visuallySimilarImages: [], slideIndex: 0, landmarks: [], displayResultsMode: false, preview: null,
+        });
+        const _this = this;
+        let req = request.post('https://ocr.kurumbus.com/api/web-url')
+                         .send({ "file_url":  url});
+        req.then(res => {
+            _this.setState({
+                pagesWithMatchingImages: res.body.pages_with_matching_images ?? [],
+                webEntities: res.body.web_entities ?? [],
+                landmarks: res.body.landmarks ?? [],
+                visuallySimilarImages: res.body.visually_similar_images ?? [],
+                showSpinner: false, displayResultsMode: true, preview: res.body.file_url
+            });
         });
     }
 }
