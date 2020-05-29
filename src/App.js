@@ -173,12 +173,12 @@ class App extends Component {
                                 </Dropzone>
                                 <Div>
                                     <Button onClick={() => this.selectProfilePhoto()} mode={"secondary"} size="xl">
-                                        Выбрать Фото Профиля
+                                        Выбрать фото из профиля
                                     </Button>
                                 </Div>
                                 <Div>
                                     <Button onClick={() => this.selectWallPhoto()} mode={"secondary"} size="xl">
-                                        Выбрать Фото Со Стены
+                                        Выбрать фото со стены
                                     </Button>
                                 </Div>
                                 {/*<Div>
