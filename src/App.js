@@ -4,6 +4,7 @@ import {
     Banner,
     Button,
     Card,
+    CardGrid,
     Div,
     Group,
     Header,
@@ -29,6 +30,7 @@ import './css/style.css'
 import Icon28HelpOutline from '@vkontakte/icons/dist/28/help_outline';
 
 const MODAL_PROFILE_PHOTOS = 'modal_profile_photos';
+const MODAL_ALBUMS = 'modal_albums';
 
 class App extends Component {
 
@@ -40,6 +42,7 @@ class App extends Component {
     static getInitState() {
         return {
             activePanel: 'mainPanel',
+            albums: [],
             pagesWithMatchingImages: [],
             webEntities: [],
             showSpinner: false,
@@ -52,33 +55,8 @@ class App extends Component {
             profilePhotos: [],
             activeModal: null,
             modalHistory: [],
-            token: null,
+            access_token: null,
             status: null,
-        };
-    }
-
-    onDropFiles() {
-        let _this = this;
-        return function (files) {
-
-            _this.setState({
-                showSpinner: true, pagesWithMatchingImages: [], webEntities: [],
-                visuallySimilarImages: [], slideIndex: 0, landmarks: [], displayResultsMode: false, preview: null,
-            });
-            const req = request.post('https://ocr.kurumbus.com/api/web');
-            files.forEach(file => {
-                req.attach('file', file);
-            });
-            req.then(res => {
-
-                _this.setState({
-                    pagesWithMatchingImages: res.body.pages_with_matching_images ?? [],
-                    webEntities: res.body.web_entities ?? [],
-                    landmarks: res.body.landmarks ?? [],
-                    visuallySimilarImages: res.body.visually_similar_images ?? [],
-                    showSpinner: false, displayResultsMode: true, preview: res.body.file_url
-                });
-            });
         };
     }
 
@@ -99,33 +77,77 @@ class App extends Component {
                         </ModalPageHeader>
                     }
                 >
+                    <Div  style={{minHeight:1200}}>
+                        {
+                            this.state.profilePhotos.length  == 0 &&
+                            <Div>
+                                <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+                                    <Spinner size="large" style={{ marginTop: 200 }} />
+                                </div>
+                            </Div>
+                        }
+                        {
+                            this.state.profilePhotos.length >0 &&
+                            <Div>
+                                {
+                                    this.state.profilePhotos.map(img =>
+                                        <img alt=""
+                                             onClick={() => {this.selectPhoto(img.sizes[2].url)}}
+                                             src={img.sizes[2].url}
+                                             key={img.sizes[2].url}
+                                             style={{width: '100%'}}
+                                             onerror="this.style.display='none'"
+                                        />
+                                    )
+                                }
+                            </Div>
+                        }
+                    </Div>
+                </ModalPage>
+                <ModalPage
+                    dynamicContentHeight
+                    settlingHeight={80}
+                    id={MODAL_ALBUMS}
+                    onClose={() => this.setState({activeModal: null})}
+                    header={
+                        <ModalPageHeader>
+                            Выберите альбом
+                        </ModalPageHeader>
+                    }
+                    style={{minHeight:1200}}
+                >
+                    {
+                        this.state.albums.length  == 0 &&
+                        <Div>
+                            <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+                                <Spinner size="large" style={{ marginTop: 200 }} />
+                            </div>
+                        </Div>
+                    }
+                    {
+                        this.state.albums.length >0 &&
+                        <Div style={{borderWidth: 1}}>
+                            {
+                                this.state.albums.map(album =>
 
-                   <Div  style={{minHeight:1200}}>
-                       {
-                           this.state.profilePhotos.length  == 0 &&
-                               <Div>
-                                   <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-                                       <Spinner size="large" style={{ marginTop: 200 }} />
-                                   </div>
-                               </Div>
-                       }
-                       {
-                           this.state.profilePhotos.length >0 &&
-                           <Div>
-                               {
-                                   this.state.profilePhotos.map(img =>
-                                       <img alt=""
-                                            onClick={() => {this.selectPhoto(img.sizes[2].url)}}
-                                            src={img.sizes[2].url}
-                                            key={img.sizes[2].url}
-                                            style={{width: '100%'}}
-                                            onerror="this.style.display='none'"
-                                       />
-                                   )
-                               }
-                           </Div>
-                       }
-                   </Div>
+                                    /*  <Card size="m">
+                                          <img alt=""
+                                               onClick={() => {
+                                               }}
+                                               style={{height: '80%'}}
+                                               src={album.thumb_src}
+
+                                               onError="this.style.display='none'"
+                                          />
+                                      </Card>*/
+
+                                    <SimpleCell onClick={() => {this.setActiveAlbum(album)}} key={album.thumb_src} before={<Avatar size={48} mode="image" src={album.thumb_src} />}>
+                                        {album.title}
+                                    </SimpleCell>
+                                )
+                            }
+                        </Div>
+                    }
                 </ModalPage>
             </ModalRoot>
         );
@@ -181,8 +203,13 @@ class App extends Component {
                                         Выбрать фото со стены
                                     </Button>
                                 </Div>
-                                {/*<Div>
-                                   {JSON.stringify(this.state.status)}
+                                <Div>
+                                    <Button onClick={() => this.selectAlbumPhoto()} mode={"secondary"} size="xl">
+                                        Выбрать фото из альбома
+                                    </Button>
+                                </Div>
+                               {/* <Div>
+                                    {JSON.stringify(this.state.status)}
                                 </Div>*/}
                                 <Placeholder
                                     icon={<Icon28HelpOutline />}
@@ -343,6 +370,31 @@ class App extends Component {
         );
     }
 
+    onDropFiles() {
+        let _this = this;
+        return function (files) {
+
+            _this.setState({
+                showSpinner: true, pagesWithMatchingImages: [], webEntities: [],
+                visuallySimilarImages: [], slideIndex: 0, landmarks: [], displayResultsMode: false, preview: null,
+            });
+            const req = request.post('https://ocr.kurumbus.com/api/web');
+            files.forEach(file => {
+                req.attach('file', file);
+            });
+            req.then(res => {
+
+                _this.setState({
+                    pagesWithMatchingImages: res.body.pages_with_matching_images ?? [],
+                    webEntities: res.body.web_entities ?? [],
+                    landmarks: res.body.landmarks ?? [],
+                    visuallySimilarImages: res.body.visually_similar_images ?? [],
+                    showSpinner: false, displayResultsMode: true, preview: res.body.file_url
+                });
+            });
+        };
+    }
+
     translateWebEntities() {
         const _this = this;
         let req = request.post('https://ocr.kurumbus.com/api/translate')
@@ -400,15 +452,15 @@ class App extends Component {
         bridge.subscribe((e) => console.log(e));
         bridge.send("VKWebAppInit", {});
         bridge.send("VKWebAppGetAuthToken", {"app_id": 7481050, "scope": "photos"}).then(data => {
-            this.setState({token: data});
+            this.setState({access_token: data.access_token});
             const access_token =  data.access_token;
             bridge.send("VKWebAppCallAPIMethod",
                 {"method": "photos.get", "request_id": "32test", "params": {"rev": 1, "v":"5.107", "album_id":"profile", "access_token": access_token}}
-                ).then(res => {
-                    this.setState({profilePhotos: res.response.items, showSpinner: false}, () => {
-                        this.setActiveModal(MODAL_PROFILE_PHOTOS);
-                    });
+            ).then(res => {
+                this.setState({profilePhotos: res.response.items, showSpinner: false}, () => {
+                    this.setActiveModal(MODAL_PROFILE_PHOTOS);
                 });
+            });
         });
     }
 
@@ -417,7 +469,7 @@ class App extends Component {
         bridge.subscribe((e) => console.log(e));
         bridge.send("VKWebAppInit", {});
         bridge.send("VKWebAppGetAuthToken", {"app_id": 7481050, "scope": "photos"}).then(data => {
-            this.setState({token: data, status: "request"});
+            this.setState({access_token: data.access_token, status: "request"});
             const access_token =  data.access_token;
             bridge.send("VKWebAppCallAPIMethod",
                 {"method": "photos.get", "request_id": "32test", "params": {"rev": 1, "v":"5.107", "album_id":"wall", "access_token": access_token}}
@@ -431,6 +483,26 @@ class App extends Component {
         });
     }
 
+    selectAlbumPhoto() {
+        this.setState({showSpinner: true});
+        bridge.subscribe((e) => console.log(e));
+        bridge.send("VKWebAppInit", {});
+        bridge.send("VKWebAppGetAuthToken", {"app_id": 7481050, "scope": "photos"}).then(data => {
+            this.setState({access_token: data.access_token, status: "request"});
+            const access_token =  data.access_token;
+            bridge.send("VKWebAppCallAPIMethod",
+                {"method": "photos.getAlbums", "params": {"v":"5.107", "need_covers":1, "access_token": access_token}}
+            ).then(res => {
+                this.setState({status: res, albums: res.response.items, showSpinner: false}, () => {
+                    this.setActiveModal(MODAL_ALBUMS);
+                });
+            }).catch(error => {
+                this.setState({status: error})
+            });
+        });
+    }
+
+
     selectPhoto(url) {
         this.setState({status: url});
         this.setActiveModal(null);
@@ -440,7 +512,7 @@ class App extends Component {
         });
         const _this = this;
         let req = request.post('https://ocr.kurumbus.com/api/web-url')
-                         .send({ "file_url":  url});
+            .send({ "file_url":  url});
         req.then(res => {
             _this.setState({
                 pagesWithMatchingImages: res.body.pages_with_matching_images ?? [],
@@ -450,6 +522,17 @@ class App extends Component {
                 showSpinner: false, displayResultsMode: true, preview: res.body.file_url
             });
         });
+    }
+
+    setActiveAlbum(album) {
+        this.setState({showSpinner: true});
+        bridge.send("VKWebAppCallAPIMethod",
+            {"method": "photos.get", "params": {"rev": 1, "v":"5.107", "album_id":album.id, "access_token": this.state.access_token}}
+        ).then(res => {
+            this.setState({profilePhotos: res.response.items, status: res, showSpinner: false}, () => {
+                this.setActiveModal(MODAL_PROFILE_PHOTOS);
+            });
+        }).catch(error => this.setState({status: error}));
     }
 }
 
