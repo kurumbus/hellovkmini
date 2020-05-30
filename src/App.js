@@ -167,7 +167,7 @@ class App extends Component {
                         {
                             ! this.state.displayResultsMode &&
                             <Group>
-                                <Dropzone onDrop={this.onDropFiles()} accept="image/jpeg,image/jpg,image/png">
+                                {/* <Dropzone onDrop={this.onDropFiles()} accept="image/jpeg,image/jpg,image/png">
                                     {({getRootProps, getInputProps}) => (
                                         <section>
                                             <Banner {...getRootProps()}
@@ -176,7 +176,7 @@ class App extends Component {
                                                     header="Выберите файл"
                                                     subheader={<span>для распознавания</span>}
                                                     background={
-                                                        <div
+                                                        <Div
                                                             style={{
                                                                 backgroundColor: '#5b9be6',
                                                                 backgroundImage: 'url(https://sun9-31.userapi.com/PQ4UCzqE_jue9hAINefBMorYCdfGXvcuV5nSjA/eYugcFYzdW8.jpg)',
@@ -186,13 +186,24 @@ class App extends Component {
                                                             }}
                                                         >
                                                             <input {...getInputProps()} />
-                                                        </div>
+                                                        </Div>
                                                     }
-                                                    actions={<Button mode="secondary_overlay" size="l">Выбрать</Button>}
+                                                    actions={<Button mode="overlay_outline" size="l" style={{marginTop: 10}}>Выбрать</Button>}
                                             />
                                         </section>
                                     )}
-                                </Dropzone>
+                                </Dropzone>*/}
+                               <Div>
+                                   <Button mode={"secondary"} size="xl">
+                                       <label htmlFor="upload">
+                                        Выбрать файл с телефона
+                                        <input type="file"
+                                               id="upload"
+                                               onChange={ (e) => this.onDropFiles(e.target.files[0])}
+                                               style={{display:"none"}}/>
+                                       </label>
+                                   </Button>
+                               </Div>
                                 <Div>
                                     <Button onClick={() => this.selectProfilePhoto()} mode={"secondary"} size="xl">
                                         Выбрать фото из профиля
@@ -211,6 +222,12 @@ class App extends Component {
                                {/* <Div>
                                     {JSON.stringify(this.state.status)}
                                 </Div>*/}
+                                {
+                                    this.state.error &&
+                                    <Div>
+                                        {this.state.error}
+                                    </Div>
+                                }
                                 <Placeholder
                                     icon={<Icon28HelpOutline />}
                                 >
@@ -370,29 +387,27 @@ class App extends Component {
         );
     }
 
-    onDropFiles() {
+    onDropFiles(f) {
+        let files = [f];
         let _this = this;
-        return function (files) {
+        _this.setState({
+            showSpinner: true, status: typeof files, pagesWithMatchingImages: [], webEntities: [],
+            visuallySimilarImages: [], slideIndex: 0, landmarks: [], displayResultsMode: false, preview: null,
+        });
+        const req = request.post('https://ocr.kurumbus.com/api/web');
+        files.forEach(file => {
+            req.attach('file', file);
+        });
+        req.then(res => {
 
             _this.setState({
-                showSpinner: true, pagesWithMatchingImages: [], webEntities: [],
-                visuallySimilarImages: [], slideIndex: 0, landmarks: [], displayResultsMode: false, preview: null,
+                pagesWithMatchingImages: res.body.pages_with_matching_images ?? [],
+                webEntities: res.body.web_entities ?? [],
+                landmarks: res.body.landmarks ?? [],
+                visuallySimilarImages: res.body.visually_similar_images ?? [],
+                showSpinner: false, displayResultsMode: true, preview: res.body.file_url
             });
-            const req = request.post('https://ocr.kurumbus.com/api/web');
-            files.forEach(file => {
-                req.attach('file', file);
-            });
-            req.then(res => {
-
-                _this.setState({
-                    pagesWithMatchingImages: res.body.pages_with_matching_images ?? [],
-                    webEntities: res.body.web_entities ?? [],
-                    landmarks: res.body.landmarks ?? [],
-                    visuallySimilarImages: res.body.visually_similar_images ?? [],
-                    showSpinner: false, displayResultsMode: true, preview: res.body.file_url
-                });
-            });
-        };
+        });
     }
 
     translateWebEntities() {
@@ -452,7 +467,7 @@ class App extends Component {
         bridge.subscribe((e) => console.log(e));
         bridge.send("VKWebAppInit", {});
         bridge.send("VKWebAppGetAuthToken", {"app_id": 7481050, "scope": "photos"}).then(data => {
-            this.setState({access_token: data.access_token});
+            this.setState({access_token: data.access_token, error: null});
             const access_token =  data.access_token;
             bridge.send("VKWebAppCallAPIMethod",
                 {"method": "photos.get", "request_id": "32test", "params": {"rev": 1, "v":"5.107", "album_id":"profile", "access_token": access_token}}
@@ -461,7 +476,7 @@ class App extends Component {
                     this.setActiveModal(MODAL_PROFILE_PHOTOS);
                 });
             });
-        });
+        }).catch(error => this.setState({error: "Приложению требуется разрешение на доступ к фотографиям", showSpinner: false}));
     }
 
     selectWallPhoto() {
@@ -469,7 +484,7 @@ class App extends Component {
         bridge.subscribe((e) => console.log(e));
         bridge.send("VKWebAppInit", {});
         bridge.send("VKWebAppGetAuthToken", {"app_id": 7481050, "scope": "photos"}).then(data => {
-            this.setState({access_token: data.access_token, status: "request"});
+            this.setState({access_token: data.access_token, status: "request", error: null});
             const access_token =  data.access_token;
             bridge.send("VKWebAppCallAPIMethod",
                 {"method": "photos.get", "request_id": "32test", "params": {"rev": 1, "v":"5.107", "album_id":"wall", "access_token": access_token}}
@@ -480,7 +495,7 @@ class App extends Component {
             }).catch(error => {
                 this.setState({status: error})
             });
-        });
+        }).catch(error => this.setState({error: "Приложению требуется разрешение на доступ к фотографиям", showSpinner: false}));
     }
 
     selectAlbumPhoto() {
@@ -488,7 +503,7 @@ class App extends Component {
         bridge.subscribe((e) => console.log(e));
         bridge.send("VKWebAppInit", {});
         bridge.send("VKWebAppGetAuthToken", {"app_id": 7481050, "scope": "photos"}).then(data => {
-            this.setState({access_token: data.access_token, status: "request"});
+            this.setState({access_token: data.access_token, status: "request", error: null});
             const access_token =  data.access_token;
             bridge.send("VKWebAppCallAPIMethod",
                 {"method": "photos.getAlbums", "params": {"v":"5.107", "need_covers":1, "access_token": access_token}}
@@ -499,7 +514,7 @@ class App extends Component {
             }).catch(error => {
                 this.setState({status: error})
             });
-        });
+        }).catch(error => this.setState({error: "Приложению требуется разрешение на доступ к фотографиям", showSpinner: false}));
     }
 
 
