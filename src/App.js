@@ -6,6 +6,7 @@ import {
     Card,
     CardGrid,
     Div,
+    File,
     Group,
     Header,
     Link,
@@ -194,7 +195,8 @@ class App extends Component {
                                     )}
                                 </Dropzone>*/}
                                <Div>
-                                   <Button mode={"secondary"} size="xl">
+                                   <File top="Выбрать файл с телефона" onChange={(e) => this.onDropFiles(e.target.files[0])} controlSize="xl" mode="secondary" />
+                                  {/* <Button mode={"secondary"} size="xl">
                                        <label htmlFor="upload">
                                         Выбрать файл с телефона
                                         <input type="file"
@@ -202,7 +204,7 @@ class App extends Component {
                                                onChange={ (e) => this.onDropFiles(e.target.files[0])}
                                                style={{display:"none"}}/>
                                        </label>
-                                   </Button>
+                                   </Button>*/}
                                </Div>
                                 <Div>
                                     <Button onClick={() => this.selectProfilePhoto()} mode={"secondary"} size="xl">
@@ -255,7 +257,7 @@ class App extends Component {
                                                 }}
                                             />
                                         }
-                                        actions={<Button mode="secondary_overlay" size="l" onClick={() => this._refresh()}>Сбросить</Button>}
+                                        actions={<Button mode="overlay" size="l" onClick={() => this._refresh()}>Сбросить</Button>}
                                 />
                             </Group>
                         }
@@ -346,6 +348,7 @@ class App extends Component {
                                             disabled
                                             multiline
                                             before={<Avatar size={72} mode="image" src={this.getPageImage(page)}/>}
+                                            onError={this.addDefaultSrc}
                                             actions={
                                                 <React.Fragment>
                                                     <Link href={page.url} target="_blank">
@@ -429,7 +432,11 @@ class App extends Component {
         if (page.full_matching_images && page.full_matching_images.length > 0) {
             return  page.full_matching_images[0].url;
         }
-        return require('./images/wiki.svg')
+        return require('./images/no-image.jpg')
+    }
+
+    addDefaultSrc(e) {
+        e.target.src = require('./images/no-image.jpg')
     }
 
     getWikiImage(article) {
